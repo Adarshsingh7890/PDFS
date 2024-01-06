@@ -1,0 +1,5 @@
+pfs_metaserver
+pfs_fileserver
+*.o
+*.pb.cc
+*.pb.h

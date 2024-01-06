@@ -1,0 +1,132 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+service MetaService {
+    rpc getClientId (ClientInfo) returns (ClientId);
+    rpc startClientService(ClientInfo) returns  (google.protobuf.Empty);
+    rpc createFile(FileCreateRequest) returns (ResponseCode);
+    rpc deleteFile(FileDeleteRequest) returns (Sidlist);
+
+    rpc openFile(FileOpenRequest) returns (ResponseCode);
+    rpc requestToken(Token) returns (ResponseCode);
+    rpc getServerInfoForBlock(Blockinfo) returns (ResponseCode);
+    rpc canCacheBlock(CacheRequest) returns (ResponseCode);
+    rpc closefd(CloseRequest) returns (google.protobuf.Empty);
+    rpc fstat(ResponseCode) returns (Metadata);
+    rpc getfilesize(File) returns (File);
+    rpc setfilesize(File) returns (File);
+
+}
+
+service ClientService {
+    rpc isConnected (ClientInfo) returns (google.protobuf.Empty);
+    rpc revokeTokens(Token) returns (google.protobuf.Empty);
+    rpc setUnlock(google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc stopRevocation(File) returns (google.protobuf.Empty);
+    rpc invalidateCacheBlock(Blockinfo) returns (google.protobuf.Empty);
+}
+
+service FileService {
+    rpc isConnected(Dummy) returns (google.protobuf.Empty);
+    rpc readData(Blockinfo) returns (Data); 
+    rpc writeData(Data) returns (google.protobuf.Empty);
+    rpc writeDataSpecific(DataSpecific) returns (google.protobuf.Empty);
+    rpc deleteFd(File) returns (google.protobuf.Empty);
+
+}
+message Sidlist {
+    int32 fd = 3;
+    repeated int32 sids = 1;
+    int32 res = 2;
+}
+
+message Dummy {
+    int32 dummy = 1;
+}
+
+message File {
+    int32 fd = 1;
+    int64 filesize = 2;
+}
+
+message Metadata {
+    string fname = 1;
+    int64 filesize = 2;
+    int64 ctime = 3;
+    int64 mtime = 4;
+    int32 res = 5;
+
+}
+
+message CacheRequest {
+    Blockinfo block = 1;
+    int32 type = 2;
+    int32 full = 3;
+    int32 clientid = 4;
+}
+
+message CloseRequest {
+    int32 clientid = 1;
+    int32 fd = 2;
+}
+
+message Data {
+    bytes data = 1;
+    int32 fd = 2;
+    int64 blocknum = 3;
+}
+
+message DataSpecific {
+    bytes data = 1;
+    int32 fd = 2;
+    int64 blocknum = 3;
+    int64 startoffset = 4;
+    int64 size = 5;
+}
+
+message Blockinfo {
+    int32 fd = 1;
+    int64 blocknum = 2;
+}
+
+message ClientInfo {
+    string client_ip = 1;
+    string client_name = 2;
+    int32 clientid = 3;
+}
+
+message ClientId {
+    int32 id = 1;
+}
+
+message FileCreateRequest {
+    string filename = 1;
+    int32 stripe_width = 2;
+}
+
+message FileDeleteRequest {
+    string filename = 1;
+}
+
+message ResponseCode {
+    int32 val = 1;
+}
+
+message FileOpenRequest {
+    string filename = 1;
+    int32 mode = 2; 
+}
+
+message Tokeninterval {
+    int64 startoffset = 1;
+    int64 endoffset = 2;   
+}
+
+message Token {
+    int32 clientid = 1;
+    int32 fd = 2;
+    repeated Tokeninterval tokenintervals = 3;
+    int32 type = 4;
+}
+
+
